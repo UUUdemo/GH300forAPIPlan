@@ -1,0 +1,86 @@
+﻿<main class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 p-4 font-sans text-gray-800">
+  <div class="container mx-auto max-w-6xl">
+    
+    <!-- Header -->
+    <header class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-gray-800 mb-4 drop-shadow-sm">☁️ 一週天氣預報</h1>
+      
+      <div class="inline-block relative">
+        <label for="city-select" class="block text-sm font-medium text-gray-700 mb-1 text-left">選擇城市：</label>
+        <select 
+          id="city-select" 
+          [value]="city()" 
+          (change)="updateCity($event)"
+          class="block w-full px-4 py-2 text-lg bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none cursor-pointer min-w-[200px]"
+        >
+          @for (c of cities; track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 mt-6">
+          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    @if (weatherResource.isLoading()) {
+      <div class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <span class="ml-3 text-lg text-blue-600 font-medium">載入中...</span>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (weatherResource.error()) {
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-center" role="alert">
+        <strong class="font-bold">發生錯誤！</strong>
+        <span class="block sm:inline">無法取得天氣資訊，請稍後再試。</span>
+        <div class="mt-2 text-sm text-left font-mono whitespace-pre-wrap bg-red-50 p-2 rounded border border-red-200">
+          {{ weatherResource.error() | json }}
+        </div>
+      </div>
+    }
+
+    <!-- Data Display -->
+    @if (weatherResource.value(); as forecast) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @for (day of forecast; track day.date) {
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden transform hover:-translate-y-1">
+            
+            <!-- Card Header -->
+            <div class="bg-blue-500 px-4 py-3 flex justify-between items-center text-white">
+              <span class="font-bold text-lg">{{ day.dayOfWeek }}</span>
+              <span class="text-sm opacity-90">{{ day.date | date:"MM/dd" }}</span>
+            </div>
+            
+            <!-- Card Body -->
+            <div class="p-6 flex flex-col items-center">
+              <div class="text-6xl mb-4 filter drop-shadow-md transform transition-transform duration-500 hover:scale-110">
+                {{ day.wxIcon }}
+              </div>
+              <div class="text-gray-600 font-medium mb-4 text-center h-12 flex items-center justify-center">
+                {{ day.wx }}
+              </div>
+              
+              <!-- Temperatures -->
+              <div class="w-full flex justify-around items-center border-t border-gray-100 pt-4">
+                <div class="text-center">
+                  <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">最高</span>
+                  <span class="text-2xl font-bold text-red-500">{{ day.maxT }}°</span>
+                </div>
+                <div class="w-px h-8 bg-gray-200"></div>
+                <div class="text-center">
+                  <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">最低</span>
+                  <span class="text-2xl font-bold text-blue-500">{{ day.minT }}°</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</main>
